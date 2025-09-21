@@ -1,0 +1,88 @@
+services:
+  api:
+    container_name: flask-application
+    image: 0rf1az/flask-application:${VERSION:?please set the version}
+    command: sh scripts/runner.sh
+    build:
+      context: api
+      args:
+        REQUESTS_VERSION: 2.32.4
+    environment:
+      - DEBUG=false
+    env_file:
+      - api/.env
+    restart: on-failure
+    develop:
+      watch:
+        - path: ./api/requirements.txt
+          action: rebuild
+        - path: ./api/Dockerfile
+          action: rebuild
+        - path: ./api
+          action: sync+exec
+          target: /code
+          exec:
+            command: echo "hello"
+    ports:
+      - 8888:5001
+    profiles:
+      - api
+    networks:
+      - full-stack
+    secrets:
+      - db_password
+    volumes:
+      - ./api:/code
+    depends_on:
+      - db
+  api-production:
+    container_name: flask-application-production
+    image: 0rf1az/flask-application:latest
+    command: sh scripts/runner.sh
+    environment:
+      - DEBUG=false
+    env_file:
+      - api/.env
+    restart: on-failure
+    ports:
+      - 9999:5001
+    networks:
+      - full-stack
+    profiles:
+      - production
+    secrets:
+      - db_password
+    depends_on:
+      - db
+  db:
+    container_name: mysql
+    image: mysql:8.0.25
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_password
+      - MYSQL_DATABASE=flask-application
+      - MYSQL_USER=api
+      - MYSQL_PASSWORD=api
+    ports:
+      - 3306:3306
+    networks:
+      - full-stack
+    profiles:
+      - api
+    secrets:
+      - db_password
+
+networks:
+  full-stack: {}
+
+volumes:
+  db-data: {}
+
+# configs:
+
+secrets:
+  db_password:
+    environment: "password"
+  db_api_password:
+    environment: "db_api_password"
+
+
