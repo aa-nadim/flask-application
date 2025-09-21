@@ -1,7 +1,7 @@
 services:
   api:
     container_name: flask-application
-    image: 0rf1az/flask-application:${VERSION:?please set the version}
+    image: a2nadim/flask-application:${VERSION:?please set the version}
     command: sh scripts/runner.sh
     build:
       context: api
@@ -37,7 +37,7 @@ services:
       - db
   api-production:
     container_name: flask-application-production
-    image: 0rf1az/flask-application:latest
+    image: a2nadim/flask-application:latest
     command: sh scripts/runner.sh
     environment:
       - DEBUG=false

@@ -1,4 +1,7 @@
 __pycache__
 pass.txt
 .env
+.env.dev
+.env.production
+*.pyc
 api/dbdata

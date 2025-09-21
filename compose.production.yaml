@@ -1,26 +1,28 @@
 services:
   back-end:
-    image: 0rf1az/flask-application:${VERSION?please set the version}
+    image: a2nadim/flask-application:${VERSION?please set the version}
     networks:
       - full-stack
     ports:
       - 5000:5001
-    secrets:
-      - db_password
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+
   db:
     container_name: mysql
     image: mysql:8.0.25
     environment:
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_password
-      - MYSQL_DATABASE=flask-application
-      - MYSQL_USER=api
-      - MYSQL_PASSWORD=api
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
     networks:
       - full-stack
-    secrets:
-      - db_password
+    ports:
+      - 3306:3306
 
-
-secrets:
-  db_password:
-    environment: "password"
+networks:
+  full-stack: {}
